@@ -1,3 +1,21 @@
+# Changelog
+
+## 2.6.4 - 2026-07-23
+
+- Add a native L5R5e adapter backed exclusively by the system's public `game.l5r5e.rangeBands` API.
+- Highlight the active grip minimum/maximum for readied weapons and frozen ranges for Strike/technique items.
+- Add L5R5e actor-sheet, Argon HUD, token and supported item-macro hover integration.
+- Label token measurements as `Range N` and use the core system's gridless fallback.
+- Extend range-cost callbacks with source/target offsets while retaining compatibility with existing adapters.
+- Fix both soft-mask browser URLs and verify their assets during release validation.
+- Point package identity and update URLs at DonHuberto's L5R5e fork while preserving Aedif's authorship and GPL.
+- Add system compatibility metadata, automated adapter tests, build checks and release validation.
+
+Existing installations point at the upstream Aedif manifest. Replace the module once using this fork's stable
+`releases/latest/download/module.json` URL; later updates will then work through Foundry.
+
+## Upstream history
+
 # 2.6.3
 
 - Fixed localization

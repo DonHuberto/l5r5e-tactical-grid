@@ -215,7 +215,7 @@ export class TacticalGridCalculator {
       });
 
       // Display distance and cover label
-      this.addUpdateLabel(token, token.center, this.genLabel(distance), cover);
+      this.addUpdateLabel(token, token.center, this.genLabel(distance, { originToken, targetToken: token }), cover);
     }
   }
 
@@ -265,7 +265,12 @@ export class TacticalGridCalculator {
     });
 
     // Display distance and cover label
-    this.addUpdateLabel(targetToken, targetToken.center, this.genLabel(distance), cover);
+    this.addUpdateLabel(
+      targetToken,
+      targetToken.center,
+      this.genLabel(distance, { originToken, targetToken }),
+      cover,
+    );
     this.addUpdateLabel(originToken, originToken.center, '');
   }
 
@@ -274,7 +279,15 @@ export class TacticalGridCalculator {
    * @param {object} distance
    * @returns {String}
    */
-  genLabel(distance) {
+  genLabel(distance, { originToken, targetToken } = {}) {
+    if (game.system.id === 'l5r5e') {
+      const rangeBands = game.l5r5e?.rangeBands;
+      if (rangeBands && originToken && targetToken) {
+        const measured = rangeBands.measureTokens(originToken.document ?? originToken, targetToken.document ?? targetToken);
+        return `Range ${measured.range}${measured.gridless ? ' (gridless estimate)' : ''}`;
+      }
+      return 'Range —';
+    }
     return `${distance} ${canvas.scene.grid.units}`;
   }
 

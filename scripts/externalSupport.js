@@ -26,6 +26,9 @@ export async function registerGameSystem() {
         case 'draw-steel':
             gameSystem = (await import('./systems/drawsteel.js')).default;
             break;
+        case 'l5r5e':
+            gameSystem = (await import('./systems/l5r5e.js')).default;
+            break;
         default:
             gameSystem = GenericSystem;
     }

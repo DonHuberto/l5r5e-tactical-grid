@@ -34,7 +34,7 @@ export class RangeHighlighter {
 
             if (gridType !== CONST.GRID_TYPES.GRIDLESS) {
                 // Full unique key to store highlight grid offsets within
-                range.cacheKey = `${mainCacheKey}:${range.range}`;
+                range.cacheKey = `${mainCacheKey}:${range.metric ?? 'distance'}:${range.range}`;
 
                 // Get the grid space shape and shrink it
                 const vertices = grid.getShape();
@@ -303,7 +303,8 @@ export class RangeHighlighter {
         const ranges = toCacheRanges;
 
         // Determine the estimated search space using the max range
-        const maxRange = (ranges[ranges.length - 1].range / canvas.dimensions.distance) * canvas.dimensions.size;
+        const maxRangeValue = Math.max(...ranges.map((range) => range.searchDistance ?? range.range));
+        const maxRange = (maxRangeValue / canvas.dimensions.distance) * canvas.dimensions.size;
         const bounds = this.token.bounds;
 
         const maxBounds = new PIXI.Rectangle(
@@ -338,6 +339,7 @@ export class RangeHighlighter {
                 }
             }
         }
+        const edgeOffsets = [...edge].map(unpack);
 
         // Get the coordinates of the top-left most occupied grid space
         // Grid highlight offsets wil be based off of this
@@ -352,11 +354,14 @@ export class RangeHighlighter {
                 // Find shortest distance to this grid space from the edge of the token
                 let shortest = Number.MAX_SAFE_INTEGER;
                 let sDiagonals = 0;
+                let shortestOrigin = null;
                 for (const t of edge) {
-                    let { distance, diagonals } = canvas.grid.measurePath([unpack(t), { i, j }], {});
+                    const originOffset = unpack(t);
+                    let { distance, diagonals } = canvas.grid.measurePath([originOffset, { i, j }], {});
                     if (distance < shortest) {
                         sDiagonals = diagonals;
                         shortest = distance;
+                        shortestOrigin = originOffset;
                     }
                 }
 
@@ -364,10 +369,16 @@ export class RangeHighlighter {
                 for (let r = 0; r < ranges.length; r++) {
                     const range = ranges[r];
 
-                    if (
-                        shortest <= range.range ||
-                        range.cost?.({ distance: shortest, diagonals: sDiagonals }) <= range.range
-                    ) {
+                    const targetOffset = { i, j };
+                    const measuredCost = range.cost?.({
+                        distance: shortest,
+                        diagonals: sDiagonals,
+                        originOffset: shortestOrigin,
+                        originOffsets: edgeOffsets,
+                        targetOffset,
+                        path: [shortestOrigin, targetOffset].filter(Boolean),
+                    });
+                    if ((range.cost ? measuredCost <= range.range : shortest <= range.range)) {
                         const { x: x0, y: y0 } = canvas.grid.getTopLeftPoint({ i, j });
                         range.cache.push({ x: (x0 - x) / canvas.grid.size, y: (y0 - y) / canvas.grid.size });
                     }

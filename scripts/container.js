@@ -119,7 +119,7 @@ export class GridMaskContainer extends foundry.canvas.containers.CachedContainer
             sprite = new PIXI.Graphics().beginFill(shapeColor).drawRect(0, 0, length, length).endFill();
             break;
           case 'square-soft':
-            sprite = PIXI.Sprite.from(`modules\\${MODULE_ID}\\images\\square_mask.webp`);
+            sprite = PIXI.Sprite.from(`modules/${MODULE_ID}/images/square_mask.webp`);
             break;
           case 'hexagonRow':
             let pointsRow = HexagonalGrid.pointyHexPoints
@@ -134,7 +134,7 @@ export class GridMaskContainer extends foundry.canvas.containers.CachedContainer
             sprite = new PIXI.Graphics().beginFill(shapeColor).drawPolygon(pointsCol).endFill();
             break;
           case 'circle-soft':
-            sprite = PIXI.Sprite.from(`modules\\${MODULE_ID}\\images\\circle_mask.webp`);
+            sprite = PIXI.Sprite.from(`modules/${MODULE_ID}/images/circle_mask.webp`);
             break;
           case 'circle':
           default:

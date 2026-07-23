@@ -2,9 +2,10 @@
   "id": "aedifs-tactical-grid",
   "title": "Aedif's Tactical Grid",
   "description": "<p>Grid toggling, item range highlighting, distance measurement, and more.</p>",
-  "version": "2.6.3",
-  "download": "https://github.com/Aedif/tactical-grid/releases/download/2.6.3/aedifs-tactical-grid.zip",
-  "manifest": "https://raw.githubusercontent.com/Aedif/tactical-grid/main/module.json",
+  "version": "2.6.4",
+  "download": "https://github.com/DonHuberto/l5r5e-tactical-grid/releases/download/v2.6.4/aedifs-tactical-grid.zip",
+  "manifest": "https://github.com/DonHuberto/l5r5e-tactical-grid/releases/latest/download/module.json",
+  "changelog": "https://github.com/DonHuberto/l5r5e-tactical-grid/blob/main/CHANGELOG.md",
   "compatibility": {
     "minimum": "13",
     "verified": "14.363"
@@ -15,6 +16,13 @@
       "url": "https://github.com/aedif",
       "discord": "aedif",
       "flags": {}
+    },
+    {
+      "name": "DonHuberto",
+      "url": "https://github.com/DonHuberto",
+      "flags": {
+        "role": "L5R5e fork maintainer"
+      }
     }
   ],
   "esmodules": [
@@ -46,10 +54,20 @@
         "type": "module",
         "compatibility": {}
       }
+    ],
+    "systems": [
+      {
+        "id": "l5r5e",
+        "type": "system",
+        "compatibility": {
+          "minimum": "1.14.105"
+        }
+      }
     ]
   },
-  "url": "https://github.com/Aedif/tactical-grid",
-  "readme": "https://github.com/Aedif/tactical-grid/blob/master/README.md",
+  "url": "https://github.com/DonHuberto/l5r5e-tactical-grid",
+  "readme": "https://github.com/DonHuberto/l5r5e-tactical-grid/blob/main/README.md",
+  "bugs": "https://github.com/DonHuberto/l5r5e-tactical-grid/issues",
   "socket": true,
   "flags": {}
 }

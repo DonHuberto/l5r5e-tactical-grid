@@ -1,15 +1,20 @@
 {
   "name": "aedifs-tactical-grid",
-  "version": "1.0.0",
+  "version": "2.6.4",
   "private": true,
+  "type": "module",
   "devDependencies": {
     "path": "^0.12.7",
     "webpack": "^5.91.0",
     "webpack-cli": "^5.1.4"
   },
   "scripts": {
-    "build": "webpack --env mode=build",
-    "watch": "webpack --env mode=watch"
+    "test": "node --test",
+    "build": "webpack --config webpack.config.cjs --env mode=build",
+    "watch": "webpack --config webpack.config.cjs --env mode=watch",
+    "validate:release": "node scripts/validate-release.mjs",
+    "audit:ui": "node scripts/validate-release.mjs",
+    "ci": "npm test && npm run build && npm run validate:release"
   },
   "dependencies": {
     "terser-webpack-plugin": "^5.3.10"
