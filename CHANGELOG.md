@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.6.5 - 2026-08-15
+
+- Replace the L5R5e token-hover grid-line mask with filled tactical cells.
+- Show the remaining movement envelope in green and append every readied weapon's minimum/maximum range in red.
+- Use the live combat movement budget, refresh an active hover after movement is spent, and fall back to three fields outside combat.
+- Render full-size cells and preserve the L5R5e two-field diagonal movement cost.
+
 ## 2.6.4 - 2026-07-23
 
 - Add a native L5R5e adapter backed exclusively by the system's public `game.l5r5e.rangeBands` API.

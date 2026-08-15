@@ -52,6 +52,85 @@ export function normalizeL5r5eProfile(source = {}) {
 }
 
 /**
+ * L5R movement on a square tactical grid charges one field for an orthogonal
+ * step and two fields for a diagonal step. Measuring from every occupied edge
+ * cell also keeps the result correct for tokens larger than one square.
+ */
+export function measureL5r5eGridFields({ originOffset, originOffsets, targetOffset } = {}) {
+  if (!targetOffset) return Infinity;
+  const candidates = originOffsets?.length ? originOffsets : [originOffset];
+  const costs = candidates.filter(Boolean).map((candidate) => {
+    const di = Math.abs(finite(targetOffset.i ?? targetOffset.x) - finite(candidate.i ?? candidate.x));
+    const dj = Math.abs(finite(targetOffset.j ?? targetOffset.y) - finite(candidate.j ?? candidate.y));
+    return di + dj;
+  });
+  return costs.length ? Math.min(...costs) : Infinity;
+}
+
+function tokenRangeStyle(color) {
+  return {
+    color,
+    alpha: 0.34,
+    lineColor: color,
+    lineWidth: 0,
+    lineAlpha: 0,
+    shrink: 1,
+  };
+}
+
+/**
+ * Build the hover envelope for an L5R token. Movement is shown first. Weapon
+ * reach is appended to that movement budget, so a 0-1 weapon and Movement 3
+ * produces a red fourth row of cells, while a 2-5 weapon produces red cells
+ * from field five through field eight.
+ */
+export function buildL5r5eTokenRanges(
+  weapons = [],
+  { movement = 3, sceneDistance = 1, gridless = false } = {},
+) {
+  if (gridless) return [];
+
+  const movementFields = Math.max(0, finite(movement, 3));
+  const distanceScale = Math.max(1, finite(sceneDistance, 1));
+  const ranges = [];
+
+  if (movementFields > 0) {
+    ranges.push({
+      id: 'l5r5e-token-movement',
+      label: `Movement ${movementFields}`,
+      range: movementFields,
+      searchDistance: movementFields * distanceScale,
+      metric: `l5r5e-token-movement:${movementFields}`,
+      cost: measureL5r5eGridFields,
+      ...tokenRangeStyle('#18c964'),
+    });
+  }
+
+  for (const [index, weapon] of Array.from(weapons).entries()) {
+    const profile = normalizeL5r5eProfile(weapon);
+    const minimum = movementFields + profile.range_min;
+    const maximum = movementFields + profile.range_max;
+    if (maximum <= 0) continue;
+
+    const baseCost = measureL5r5eGridFields;
+    ranges.push({
+      id: `l5r5e-token-weapon-${weapon?.uuid ?? weapon?.id ?? index}`,
+      label: `${weapon?.name ?? 'Weapon'} ${profile.range_min}-${profile.range_max}`,
+      range: maximum,
+      searchDistance: maximum * distanceScale,
+      metric: `l5r5e-token-weapon:${minimum}:${maximum}`,
+      cost: (context) => {
+        const fields = baseCost(context);
+        return fields < minimum ? Infinity : fields;
+      },
+      ...tokenRangeStyle('#e53945'),
+    });
+  }
+
+  return ranges;
+}
+
+/**
  * Build visual boundaries while delegating every range-band conversion and
  * path measurement to game.l5r5e.rangeBands.
  */

@@ -1,5 +1,5 @@
 import { GenericSystem } from './generic.js';
-import { buildL5r5eRanges } from './l5r5e-range.js';
+import { buildL5r5eRanges, buildL5r5eTokenRanges } from './l5r5e-range.js';
 
 function rangeBands() {
   return game.l5r5e?.rangeBands ?? null;
@@ -13,6 +13,40 @@ function isHeldWeapon(item) {
   return item?.type === 'weapon' && Boolean(item.system?.equipped && item.system?.readied);
 }
 
+function tokenCombatant(token) {
+  const direct = token?.document?.combatant ?? token?.combatant;
+  if (direct) return direct;
+  return Array.from(game.combat?.combatants ?? []).find(
+    (combatant) =>
+      combatant?.tokenId === token?.document?.id ||
+      combatant?.token?.id === token?.document?.id ||
+      combatant?.actorId === token?.actor?.id,
+  );
+}
+
+function movementRemaining(token) {
+  const fallback = 3;
+  const turns = game.l5r5e?.turns;
+  const combatant = tokenCombatant(token);
+  if (!turns?.getState || !combatant) return fallback;
+
+  try {
+    const state = turns.getState(combatant);
+    const fromGetters = turns.getters?.(state)?.movementRemaining;
+    const budget = Number(state?.freeMovement?.budget);
+    const spent = Number(state?.freeMovement?.spent);
+    const value = Number.isFinite(Number(fromGetters))
+      ? Number(fromGetters)
+      : Number.isFinite(budget) && Number.isFinite(spent)
+        ? Math.max(0, budget - spent)
+        : fallback;
+    return Math.max(0, value);
+  } catch (error) {
+    console.warn('Tactical Grid | Could not read the L5R5e movement budget; using 3 fields.', error);
+    return fallback;
+  }
+}
+
 export default class L5r5eSystem extends GenericSystem {
   static _rangesFor(source, id) {
     return buildL5r5eRanges(source, rangeBands(), {
@@ -24,9 +58,12 @@ export default class L5r5eSystem extends GenericSystem {
 
   /** @override */
   static getTokenRange(token) {
-    return Array.from(token?.actor?.items ?? [])
-      .filter(isHeldWeapon)
-      .flatMap((item, index) => this._rangesFor(item, itemKey(item, index)));
+    const weapons = Array.from(token?.actor?.items ?? []).filter(isHeldWeapon);
+    return buildL5r5eTokenRanges(weapons, {
+      movement: movementRemaining(token),
+      sceneDistance: canvas.scene?.grid?.distance ?? 1,
+      gridless: canvas.grid?.type === CONST.GRID_TYPES.GRIDLESS,
+    });
   }
 
   /** @override */

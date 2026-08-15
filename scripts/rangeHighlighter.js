@@ -549,16 +549,25 @@ export function registerRangeHighlightHooks() {
     });
 
     Hooks.on('hoverToken', (token, hoverIn) => {
-        if (!MODULE_CONFIG.range.token.enabled) return;
+        const l5rFilledCellHover = game.system?.id === 'l5r5e' && MODULE_CONFIG.enableOnHover;
+        if (!MODULE_CONFIG.range.token.enabled && !l5rFilledCellHover) return;
         if (!MODULE_CLIENT_CONFIG.rangeHighlighter) return;
         if (MODULE_CONFIG.range.token.combatOnly && !game.combat?.started) return;
         if (!game.user.isGM && !(token.isOwner || MODULE_CONFIG.range.token.dispositions[token.document.disposition]))
             return;
         if (hoverIn && token.actor) {
-            RangeHighlightAPI.rangeHighlight(token);
+            RangeHighlightAPI.rangeHighlight(token, { force: l5rFilledCellHover });
         } else {
             RangeHighlightAPI.clearRangeHighlight(token);
         }
+    });
+
+    // Keep the green movement envelope in sync when movement is spent while
+    // the pointer remains over the token.
+    Hooks.on('l5r5e.movementBudgetChanged', (combatant) => {
+        if (game.system?.id !== 'l5r5e' || !MODULE_CONFIG.enableOnHover) return;
+        const token = combatant?.token?.object ?? canvas.tokens?.get?.(combatant?.tokenId);
+        if (token?.hover && token.actor) RangeHighlightAPI.rangeHighlight(token, { force: true });
     });
 
     const checkApplyFlagRanges = function (token) {

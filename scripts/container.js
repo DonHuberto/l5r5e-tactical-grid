@@ -44,11 +44,14 @@ export class GridMaskContainer extends foundry.canvas.containers.CachedContainer
       return;
     }
 
-    const applicableTokens = layer.placeables.filter(
-      (p) =>
-        (MODULE_CONFIG.enableOnControl && p.controlled) ||
-        (MODULE_CONFIG.enableOnHover && (layer.highlightObjects || p.hover || hasPreview(p)))
-    );
+    const l5rTokenHoverUsesFilledCells = game.system?.id === 'l5r5e' && cleanLayerName(layer) === 'TokenLayer';
+    const applicableTokens = layer.placeables.filter((p) => {
+      const controlled = MODULE_CONFIG.enableOnControl && p.controlled && !(l5rTokenHoverUsesFilledCells && p.hover);
+      const hovered =
+        MODULE_CONFIG.enableOnHover &&
+        (layer.highlightObjects || hasPreview(p) || (!l5rTokenHoverUsesFilledCells && p.hover));
+      return controlled || hovered;
+    });
 
     if (MODULE_CONFIG.enableOnRuler) {
       let ruler = canvas.controls.ruler;
