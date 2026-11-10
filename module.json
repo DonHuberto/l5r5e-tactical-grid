@@ -2,13 +2,13 @@
   "id": "aedifs-tactical-grid",
   "title": "Aedif's Tactical Grid",
   "description": "<p>Grid toggling, item range highlighting, distance measurement, and more.</p>",
-  "version": "2.6.5",
-  "download": "https://github.com/DonHuberto/l5r5e-tactical-grid/releases/download/v2.6.5/aedifs-tactical-grid.zip",
+  "version": "2.6.6",
+  "download": "https://github.com/DonHuberto/l5r5e-tactical-grid/releases/download/v2.6.6/aedifs-tactical-grid.zip",
   "manifest": "https://github.com/DonHuberto/l5r5e-tactical-grid/releases/latest/download/module.json",
   "changelog": "https://github.com/DonHuberto/l5r5e-tactical-grid/blob/main/CHANGELOG.md",
   "compatibility": {
     "minimum": "13",
-    "verified": "14.363"
+    "verified": "14.370"
   },
   "authors": [
     {

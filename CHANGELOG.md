@@ -519,3 +519,11 @@ New Controls
 # 1.4.1
 
 - Initial public release
+# Changelog
+
+## 2.6.6 - 2026-11-10
+
+- Clear L5R movement and weapon range highlights when the pointer leaves a token.
+- Keep ordinary tagged range highlights intact when cleaning up the L5R hover overlay.
+- Add regression coverage for token-hover cleanup and run the module build/release validator.
+

@@ -1,5 +1,6 @@
 import { MODULE_CLIENT_CONFIG, MODULE_CONFIG } from '../applications/settings.js';
 import { registerGameSystem, registerModules } from './externalSupport.js';
+import { retainedRangesAfterClear } from './rangeClear.js';
 import { MODULE_ID } from './utils.js';
 
 export class RangeHighlighter {
@@ -558,7 +559,10 @@ export function registerRangeHighlightHooks() {
         if (hoverIn && token.actor) {
             RangeHighlightAPI.rangeHighlight(token, { force: l5rFilledCellHover });
         } else {
-            RangeHighlightAPI.clearRangeHighlight(token);
+            RangeHighlightAPI.clearRangeHighlight(
+                token,
+                game.system?.id === 'l5r5e' ? { idPrefix: 'l5r5e-token-' } : undefined,
+            );
         }
     });
 
@@ -675,7 +679,7 @@ export class RangeHighlightAPI {
      * Clears highlights applied using TacticalGrid.rangeHighlight(...)
      * @param {Token|Array[Token]} tokens Tokens to remove the highlights from
      */
-    static clearRangeHighlight(tokens, { force = false, id } = {}) {
+    static clearRangeHighlight(tokens, { force = false, id, idPrefix } = {}) {
         if (!(tokens instanceof Array)) tokens = [tokens];
 
         for (const token of tokens) {
@@ -686,12 +690,7 @@ export class RangeHighlightAPI {
                     return;
                 }
                 const ranges = token._tgRange.ranges;
-                let nRanges = [];
-                for (const range of ranges) {
-                    if (range.id && range.id !== id) {
-                        nRanges.push(range);
-                    }
-                }
+                const nRanges = retainedRangesAfterClear(ranges, { id, idPrefix });
 
                 if (nRanges.length === 0) {
                     token._tgRange.clear();
